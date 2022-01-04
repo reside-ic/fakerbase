@@ -4,7 +4,6 @@ con <- DBI::dbConnect(RPostgres::Postgres(),
                       user = "montagu",
                       password = "montagu")
 
-
 generate_mocks <- function(con, schema_name) {
   safe_param <- DBI::dbQuoteLiteral(con, schema_name)
   file_con <- file("generated.R")
