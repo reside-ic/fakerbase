@@ -1,9 +1,3 @@
-con <- DBI::dbConnect(RPostgres::Postgres(),
-                      dbname = "montagu",
-                      host = "localhost",
-                      user = "montagu",
-                      password = "montagu")
-
 int_types <- c("integer", "smallint")
 logi_types <- c("boolean")
 num_types <- c("date", "numeric", "real")
@@ -21,17 +15,8 @@ generate_type_check <- function(column_name, data_type, is_nullable) {
   paste0("stopifnot(", na_check, type_check, ")")
 }
 
-get_tables <- function(con, schema_name) {
-  safe_param <- DBI::dbQuoteLiteral(con, schema_name)
-  query <- paste0("SELECT column_name, table_name, data_type, column_default, is_nullable FROM
-  information_schema.columns WHERE table_schema = ", safe_param)
-  tables <- DBI::dbGetQuery(con, query)
-  tables$type_check <- generate_type_check(tables$column_name, tables$data_type, tables$is_nullable)
-  split(tables, tables$table_name)
-}
-
 generate_mock_table <- function(table) {
-  ret <- paste0("mock_", table$table_name[[1]], " <- function(")
+  ret <- paste0("fake_", table$table_name[[1]], " <- function(")
   args <- paste0(table$column_name, ifelse(table$is_nullable == "YES", " = NA", ""), collapse = ", ")
   dat <- paste(table$column_name, "=", table$column_name, collapse = ", ")
   ret <- paste0(ret, args, ") {\n ")
@@ -41,12 +26,29 @@ generate_mock_table <- function(table) {
   ret
 }
 
-generate_mocks <- function(con, schema_name) {
-  tables <- get_tables(con, schema_name)
-  file_con <- file("generated.R")
-  on.exit(close(file_con))
-  mocks <- sapply(tables, generate_mock_table)
-  writeLines(mocks, file_con)
+build_mocks <- function(tables) {
+  tables$type_check <- generate_type_check(tables$column_name, tables$data_type, tables$is_nullable)
+  tables <- split(tables, tables$table_name)
+  sapply(tables, generate_mock_table)
 }
 
-generate_mocks(con, "public")
+get_tables <- function(con, schema_name) {
+  safe_param <- DBI::dbQuoteLiteral(con, schema_name)
+  query <- paste0("SELECT column_name, table_name, data_type, column_default, is_nullable FROM
+  information_schema.columns WHERE table_schema = ", safe_param)
+  DBI::dbGetQuery(con, query)
+}
+
+#' Generate file containing mocking functions for all tables in the given db schema
+#'
+#' @param con DBI connection
+#' @param schema_name name of the db schema
+#' @param path path to the directory where the mocks should be generated
+#' @export
+generate_mocks <- function(con, schema_name, path) {
+  dest <- file.path(path, "inst/fakerbase")
+  dir.create(dest, recursive = TRUE, showWarnings = FALSE)
+  tables <- get_tables(con, schema_name)
+  mocks <- build_mocks(tables)
+  writeLines(mocks, file.path(dest, "generated.R"))
+}
