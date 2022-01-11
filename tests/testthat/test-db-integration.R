@@ -6,6 +6,6 @@ test_that("can generate functions from db", {
                         password = "password",
                         user = "postgres")
 
-  generate_mocks(con, "pg_catalog", "tests")
-  expect_error(parse(file.path("tests/inst/fakerbase/generated.R")), NA)
+  expect_error(generate(con, "pg_catalog", "tests"), NA)
+  expect_true(file.exists("tests/inst/fakerbase/generated.R"))
 })

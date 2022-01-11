@@ -39,7 +39,7 @@ get_tables <- function(con, schema_name) {
   DBI::dbGetQuery(con, query)
 }
 
-#' Generate file containing mocking functions for all tables in the given db schema
+#' Generate and load into the environment functions for creating fake db tables for the given db schema
 #'
 #' @param con DBI connection
 #' @param schema_name name of the db schema
@@ -51,4 +51,5 @@ generate <- function(con, schema_name, path) {
   tables <- get_tables(con, schema_name)
   mocks <- generate_functions(tables)
   writeLines(mocks, file.path(dest, "generated.R"))
+  source(file.path(dest, "generated.R"))
 }

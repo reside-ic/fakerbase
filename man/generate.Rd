@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate.R
 \name{generate}
 \alias{generate}
-\title{Generate file containing mocking functions for all tables in the given db schema}
+\title{Generate and load into the environment functions for creating fake db tables for the given db schema}
 \usage{
 generate(con, schema_name, path)
 }
@@ -14,5 +14,5 @@ generate(con, schema_name, path)
 \item{path}{path to the directory where the mocks should be generated}
 }
 \description{
-Generate file containing mocking functions for all tables in the given db schema
+Generate and load into the environment functions for creating fake db tables for the given db schema
 }
