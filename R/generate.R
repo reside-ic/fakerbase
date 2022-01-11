@@ -15,7 +15,7 @@ generate_type_check <- function(column_name, data_type, is_nullable) {
   paste0("stopifnot(", na_check, type_check, ")")
 }
 
-generate_mock_table <- function(table) {
+generate_fake_table_function <- function(table) {
   ret <- paste0("fake_", table$table_name[[1]], " <- function(")
   args <- paste0(table$column_name, ifelse(table$is_nullable == "YES", " = NA", ""), collapse = ", ")
   dat <- paste(table$column_name, "=", table$column_name, collapse = ", ")
@@ -26,10 +26,10 @@ generate_mock_table <- function(table) {
   ret
 }
 
-build_mocks <- function(tables) {
+generate_functions <- function(tables) {
   tables$type_check <- generate_type_check(tables$column_name, tables$data_type, tables$is_nullable)
   tables <- split(tables, tables$table_name)
-  sapply(tables, generate_mock_table)
+  sapply(tables, generate_fake_table_function)
 }
 
 get_tables <- function(con, schema_name) {
@@ -45,10 +45,10 @@ get_tables <- function(con, schema_name) {
 #' @param schema_name name of the db schema
 #' @param path path to the directory where the mocks should be generated
 #' @export
-generate_mocks <- function(con, schema_name, path) {
+generate <- function(con, schema_name, path) {
   dest <- file.path(path, "inst/fakerbase")
   dir.create(dest, recursive = TRUE, showWarnings = FALSE)
   tables <- get_tables(con, schema_name)
-  mocks <- build_mocks(tables)
+  mocks <- `generate_functions]`(tables)
   writeLines(mocks, file.path(dest, "generated.R"))
 }

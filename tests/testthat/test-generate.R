@@ -35,7 +35,7 @@ test_that("method args default to NA if column accepts nulls", {
                     column_name = c("nullable", "non-nullable"),
                     data_type = c("integer", "integer"),
                     is_nullable = c("YES", "NO"))
-  mock_code <- generate_mock_table(tab)
+  mock_code <- generate_fake_table_function(tab)
   expected_first_line <- "fake_test_table <- function(nullable = NA, non-nullable) {"
   expect_equal(unlist(strsplit(mock_code, "\n"))[1], expected_first_line)
 })
@@ -46,7 +46,7 @@ test_that("can generate a valid function", {
                     data_type = c("integer", "varchar"),
                     is_nullable = c("NO", "YES"))
 
-  mock_code <- generate_mock_table(tab)
+  mock_code <- generate_fake_table_function(tab)
   eval(str2expression(mock_code))
 
   country <- fake_country(c(1L, 2L), c("AFG", "AGH"))
@@ -60,7 +60,7 @@ test_that("functions handle type checking", {
                     data_type = c("integer", "varchar"),
                     is_nullable = c("NO", "YES"))
 
-  mock_code <- build_mocks(tab)
+  mock_code <- generate_functions(tab)
   eval(str2expression(mock_code))
 
   valid_id_and_name <- fake_country(1L, "AFG")
@@ -82,7 +82,7 @@ test_that("can generate multiple functions", {
                     data_type = c("integer", "text", "integer", "text"),
                     is_nullable = "NO")
 
-  mock_code <- build_mocks(tab)
+  mock_code <- generate_functions(tab)
   eval(str2expression(mock_code))
 
   country <- fake_country(1L, "AFG")
