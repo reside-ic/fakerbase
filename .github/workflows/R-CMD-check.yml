@@ -72,7 +72,7 @@ jobs:
 
       - name: Start test DB
         if: runner.os == 'Linux'
-        run: ./scripts/test_db_start.sh
+        run: ./scripts/start_test_db.sh
 
       - name: Check
         env:

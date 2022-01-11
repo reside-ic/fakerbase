@@ -49,6 +49,6 @@ generate <- function(con, schema_name, path) {
   dest <- file.path(path, "inst/fakerbase")
   dir.create(dest, recursive = TRUE, showWarnings = FALSE)
   tables <- get_tables(con, schema_name)
-  mocks <- `generate_functions]`(tables)
+  mocks <- generate_functions(tables)
   writeLines(mocks, file.path(dest, "generated.R"))
 }
