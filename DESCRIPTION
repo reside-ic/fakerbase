@@ -5,12 +5,12 @@ Authors@R:
     c(person("Alex", "Hill", email = "alex.hill@gmail.com", role = c("aut", "cre")),
      person("Imperial College of Science, Technology and Medicine", role = "cph"))
 Description: Connect to a Postgres database and generate a suite of functions that can be used to mock database tables for unit testing.
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 Imports:
-    DBI,
-    RPostgres
+    DBI
 Suggests:
+    RPostgres,
     testthat
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
