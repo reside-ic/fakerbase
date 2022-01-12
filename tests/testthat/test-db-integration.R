@@ -4,7 +4,7 @@ test_that("can generate functions from db", {
                         host = "localhost",
                         port = 5432,
                         password = "password",
-                        user = "postgres")
+                        user = "test")
 
   expect_error(generate(con, "pg_catalog", "tests"), NA)
   expect_true(file.exists("tests/inst/fakerbase/generated.R"))

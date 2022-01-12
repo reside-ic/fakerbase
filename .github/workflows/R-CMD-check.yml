@@ -70,9 +70,37 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
-      - name: Start test DB
+      - name: Start test DB Linux
         if: runner.os == 'Linux'
         run: ./scripts/start_test_db.sh
+
+      - name: Start test DB Windows
+        if: runner.os == 'Windows'
+        run: |
+          $pgService = Get-Service -Name postgresql*
+          Set-Service -InputObject $pgService -Status running -StartupType automatic
+          Start-Process -FilePath "$env:PGBIN\pg_isready" -Wait -PassThru
+          & $env:PGBIN\psql --command="CREATE USER test PASSWORD 'password'" --command="\du"
+
+      - name: Start test DB Mac
+        if: runner.os == 'macOS'
+        run: |
+          brew services start postgresql
+          echo "Check PostgreSQL service is running"
+          i=10
+          COMMAND='pg_isready'
+          while [ $i -gt 0 ]; do
+              echo "Check PostgreSQL service status"
+              eval $COMMAND && break
+              ((i--))
+              if [ $i == 0 ]; then
+                  echo "PostgreSQL service not ready, all attempts exhausted"
+                  exit 1
+              fi
+              echo "PostgreSQL service not ready, wait 10 more sec, attempts left: $i"
+              sleep 10
+          done
+          psql --command="CREATE USER test PASSWORD 'password'" --command="\du" postgres
 
       - name: Check
         env:
