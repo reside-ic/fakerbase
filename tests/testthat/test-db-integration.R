@@ -6,7 +6,7 @@ test_that("can generate functions from db", {
                         password = "northwind",
                         user = "northwind")
 
-  db <- generate(con, "public", "tests")
+  db <- generate(con, "public")
   fake_categories <- db$categories(category_id = 1L, category_name = "test cat")
   expect_equal(fake_categories$category_id, 1L)
   expect_equal(fake_categories$category_name, "test cat")

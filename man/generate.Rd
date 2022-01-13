@@ -2,17 +2,18 @@
 % Please edit documentation in R/generate.R
 \name{generate}
 \alias{generate}
-\title{Generate and load into the environment functions for creating fake db tables for the given db schema}
+\title{Generate mocking functions for all tables in the given db schema}
 \usage{
-generate(con, schema_name, path)
+generate(con, schema_name = "public")
 }
 \arguments{
 \item{con}{DBI connection}
 
 \item{schema_name}{name of the db schema}
-
-\item{path}{path to the directory where the mocks should be generated}
+}
+\value{
+list of named functions corresponding to the tables in the schema
 }
 \description{
-Generate and load into the environment functions for creating fake db tables for the given db schema
+Generate mocking functions for all tables in the given db schema
 }

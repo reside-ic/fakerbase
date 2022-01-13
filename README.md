@@ -8,31 +8,31 @@ creating in memory data frames that mirror the structure of the database, for ea
 
 ## Usage
 
-1. Create a db connection
+1. Create a db connection. To start a dockerised Postgres database containing the Northwind sample database using [this image](https://github.com/bradymholt/docker-postgresql-northwind), run `./scripts/start_test_db.sh`. 
+Then you can use the following connection:
 
 ```{r}
     con <- DBI::dbConnect(RPostgres::Postgres(),
-                        dbname = "montagu",
+                        dbname = "northwind",
                         host = "localhost",
-                        user = "montagu",
-                        password = "montagu")
+                        user = "northwind",
+                        password = "northwind")
 ```
 
 2. Generate and load functions for creating fake db tables
 
 ```{r}    
-    fakerbase::generate(con, "public", ".")
+    db <- fakerbase::generate(con, "public", ".")
 ```
 
 3. Use generated functions to create fake db tables
 
 ```{r}
-    country <- fake_country(id = "AFG", name = "Afghanistan", nid = 123L)
-    str(country)
-    'data.frame':	1 obs. of  3 variables:
-     $ id  : chr "AFG"
-     $ name: chr "Afghanistan"
-     $ nid : int 123
+    region <- db$region(id = 123L, name = "Central America")
+    str(region)
+    'data.frame':	1 obs. of  2 variables:
+     $ region_id  : int 123
+     $ region_description: chr "Central America"
 ```
 
 ## Testing

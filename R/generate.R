@@ -64,9 +64,13 @@ fetch_tables <- function(con, schema_name) {
   DBI::dbGetQuery(con, query)
 }
 
-generate <- function(con, schema = "public", path = ".") {
-  dest <- file.path(path, "inst/fakerbase")
-  dir.create(dest, recursive = TRUE, showWarnings = FALSE)
-  tables <- tables_with_types(tables <- fetch_tables(con, schema))
+#' Generate mocking functions for all tables in the given db schema
+#'
+#' @param con DBI connection
+#' @param schema_name name of the db schema
+#' @returns list of named functions corresponding to the tables in the schema
+#' @export
+generate <- function(con, schema_name = "public") {
+  tables <- tables_with_types(tables <- fetch_tables(con, schema_name))
   lapply(tables, build)
 }
