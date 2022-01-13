@@ -13,7 +13,7 @@ test_that("can generate functions from db", {
   expect_true(is.na(fake_categories$description))
   expect_true(is.na(fake_categories$picture))
 
-  fake_region <- db$region(c(1L, 2L), c("region 1", "region 2"))
+  fake_region <- db$region(region_id = c(1L, 2L), region_description = c("region 1", "region 2"))
   expect_equal(fake_region$region_id, c(1L, 2L))
   expect_equal(fake_region$region_description, c("region 1", "region 2"))
 })

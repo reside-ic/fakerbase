@@ -53,7 +53,11 @@ jobs:
           $pgService = Get-Service -Name postgresql*
           Set-Service -InputObject $pgService -Status running -StartupType automatic
           Start-Process -FilePath "$env:PGBIN\pg_isready" -Wait -PassThru
-          & $env:PGBIN\psql --command="CREATE USER test PASSWORD 'password'" --command="\du"
+          & $env:PGBIN\psql --command="CREATE USER northwind WITH PASSWORD 'northwind';" --command="CREATE DATABASE northwind OWNER northwind;" postgres
+          $client = new-object System.Net.WebClient
+          $client.DownloadFile("https://raw.githubusercontent.com/yugabyte/yugabyte-db/master/sample/northwind_ddl.sql", "northwind_ddl.sql")
+          $env:PGPASSWORD = 'northwind'
+          & $env:PGBIN\psql -U northwind -h localhost -d northwind -f northwind_ddl.sql
 
       - name: Start test DB Mac
         if: runner.os == 'macOS'
@@ -73,8 +77,9 @@ jobs:
               echo "PostgreSQL service not ready, wait 10 more sec, attempts left: $i"
               sleep 10
           done
-          psql --command="CREATE USER test PASSWORD 'password'" --command="\du" postgres
-
+          psql --command="CREATE USER northwind WITH PASSWORD 'northwind';" --command="CREATE DATABASE northwind OWNER northwind;" postgres
+          wget https://raw.githubusercontent.com/yugabyte/yugabyte-db/master/sample/northwind_ddl.sql
+          PGPASSWORD=northwind psql northwind -h localhost -d northwind -f northwind_ddl.sql
       - uses: r-lib/actions/check-r-package@v1
 
       - name: Show testthat output
