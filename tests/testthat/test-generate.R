@@ -54,7 +54,7 @@ test_that("functions handle type checking", {
   expect_true(is.na(no_name$name))
 
   expect_error(fn(), "argument \"id\" is missing, with no default")
-  expect_error(fn(NA_integer_), "!any(is.na(id)) is not TRUE", fixed = TRUE)
-  expect_error(fn("AFG"), "typeof(id) == \"integer\" is not TRUE", fixed = TRUE)
-  expect_error(fn(1L, 123), "typeof(name) == \"character\" is not TRUE", fixed = TRUE)
+  expect_error(fn(NA_integer_), "NA values found in 'id', but it is not nullable", fixed = TRUE)
+  expect_error(fn("AFG"), "Expected 'id' to be of type 'integer' (but was 'character')", fixed = TRUE)
+  expect_error(fn(1L, 123), "Expected 'name' to be of type 'character' (but was 'double')", fixed = TRUE)
 })

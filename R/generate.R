@@ -3,11 +3,21 @@ logi_types <- c("boolean")
 num_types <- c("numeric", "real")
 date_types <- c("date", "timestamp without time zone", "timestamp with time zone")
 
-validate_type <- quote(stopifnot(typeof(x) == y))
-validate_inherits <- quote(stopifnot(inherits(x, y)))
-validate_nulls <- quote(stopifnot(!any(is.na(x))))
+validate <- function(x, r_type, nullable) {
+  name <- deparse(substitute(x))
+  if (r_type %in% date_types) {
+    if (!inherits(x, r_type)) stop(sprintf("Expected '%s' to be of type '%s' (but was '%s')", name, r_type, typeof(x)),
+                                   call. = FALSE)
+  }
+  else {
+    if (typeof(x) != r_type) stop(sprintf("Expected '%s' to be of type '%s' (but was '%s')", name, r_type, typeof(x)),
+                                  call. = FALSE)
+  }
+  if (!nullable && any(is.na(x))) stop(sprintf("NA values found in '%s', but it is not nullable", name),
+                                       call. = FALSE)
+}
 
-build <- function(table, env = topenv()) {
+build <- function(table, env = asNamespace("fakerbase")) {
   args <- do.call(build_args, table)
   names(args) <- table$column_name
   cols <- lapply(table$column_name, as.name)
@@ -17,13 +27,10 @@ build <- function(table, env = topenv()) {
                     list(stringsAsFactors = FALSE)))
 
   body <- c(
-    unlist(Map(function(col_name, is_nullable, r_type) {
-      env <- list(x = as.name(col_name), y = r_type)
-      c(if (r_type == "POSIXct") substitute_(validate_inherits, env),
-        if (r_type != "POSIXct") substitute_(validate_type, env),
-        if (is_nullable == "NO") substitute_(validate_nulls, env))
-    },
-               table$column_name, table$is_nullable, table$r_type)),
+    Map(function(col_name, is_nullable, r_type) {
+      env <- list(x = as.name(col_name), y = r_type, z = is_nullable == "YES")
+      substitute_(quote(validate(x, y, z)), env)
+    }, table$column_name, table$is_nullable, table$r_type),
     list(expr))
 
   as_function(args, body, env)
