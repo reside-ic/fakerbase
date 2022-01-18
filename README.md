@@ -22,17 +22,23 @@ Then you can use the following connection:
 2. Generate and load functions for creating fake db tables
 
 ```{r}    
-    db <- fakerbase::generate(con, "public", ".")
+    db <- fakerbase::generate(con, "public")
 ```
 
 3. Use generated functions to create fake db tables
 
 ```{r}
-    region <- db$region(id = 123L, name = "Central America")
+    region <- db$region(region_id = 123L, region_description = "Central America")
     str(region)
     'data.frame':	1 obs. of  2 variables:
      $ region_id  : int 123
      $ region_description: chr "Central America"
+```
+
+4. To re-use generated functions without re-connecting to the database, use
+
+```{r}
+    db <- fakerbase::load("northwind", "public")
 ```
 
 ## Testing

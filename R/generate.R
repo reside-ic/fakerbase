@@ -78,6 +78,28 @@ fetch_tables <- function(con, schema_name) {
 #' @returns list of named functions corresponding to the tables in the schema
 #' @export
 generate <- function(con, schema_name = "public") {
-  tables <- tables_with_types(tables <- fetch_tables(con, schema_name))
-  lapply(tables, build)
+  dbname <- DBI::dbGetInfo(con)$dbname
+  dest <- file.path("inst/fakerbase", dbname, schema_name)
+  dir.create(dest, recursive = TRUE, showWarnings = FALSE)
+  tables <- tables_with_types(tables = fetch_tables(con, schema_name))
+  fns <- lapply(tables, build)
+  saveRDS(fns, file.path(dest, "generated.rds"))
+  fns
+}
+
+#' Load previously generated mocking functions for all tables in the given db and schema
+#'
+#' @param dbname name of the database
+#' @param schema_name name of the db schema
+#' @returns list of named functions corresponding to the tables in the schema
+#' @export
+load <- function(dbname, schema_name = "public") {
+  db_dir <- file.path("inst/fakerbase", dbname)
+  e <- "Functions for database '%s' have not been generated yet. See fakerbase::generate"
+  if (!dir.exists(db_dir)) stop(sprintf(e, dbname), call. = FALSE)
+  schema_dir <- file.path(db_dir, schema_name)
+  e <- "Functions for schema '%s' have not been generated yet. See fakerbase::generate"
+  if (!dir.exists(schema_dir)) stop(sprintf(e, schema_name), call. = FALSE)
+  generated <- file.path(schema_dir, "generated.rds")
+  readRDS(generated)
 }
