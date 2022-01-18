@@ -1,6 +1,6 @@
 Package: fakerbase
 Title: Fake Database Tables For Unit Testing
-Version: 0.0.0.1
+Version: 0.0.1
 Authors@R: 
     c(person("Alex", "Hill", email = "alex.hill@gmail.com", role = c("aut", "cre")),
      person("Imperial College of Science, Technology and Medicine", role = "cph"))

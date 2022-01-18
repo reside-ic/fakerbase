@@ -3,8 +3,10 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 ![R-CMD-check](https://github.com/reside-ic/fakerbase/actions/workflows/R-CMD-check.yml/badge.svg)
 
-Use case: unit testing code that manipulates data frames obtained by querying a SQL database. Auto-generate functions for 
+Use case: unit testing code that manipulates data frames obtained by querying a Postgres database. Auto-generate functions for 
 creating in memory data frames that mirror the structure of the database, for easy mocking of the tables. 
+
+**Note that for now this only supports Postgres databases with the following types: "integer", "smallint", "boolean", "numeric", "real", "date", "timestamp without time zone", "timestamp with time zone"**
 
 ## Usage
 
