@@ -6,7 +6,7 @@ test_that("can generate and load from db", {
                         password = "northwind",
                         user = "northwind")
 
-  db <- generate(con, "public")
+  db <- fb_generate(con, ".", "public")
   fake_categories <- db$categories(category_id = 1L, category_name = "test cat")
   expect_equal(fake_categories$category_id, 1L)
   expect_equal(fake_categories$category_name, "test cat")
@@ -26,8 +26,8 @@ test_that("can load without db connection", {
                         password = "northwind",
                         user = "northwind")
 
-  generated <- generate(con, "public")
-  loaded <- load("northwind", "public")
+  generated <- fb_generate(con, ".", "public")
+  loaded <- fb_load("northwind", ".", "public")
   expect_equal(generated, loaded)
 })
 
@@ -39,7 +39,7 @@ test_that("loading un-generated functions gives descriptive error message", {
                         password = "northwind",
                         user = "northwind")
 
-  generated <- generate(con, "public")
-  expect_error(load("baddbname", "public"), "Functions for database 'baddbname' have not been generated yet. See fakerbase::generate")
-  expect_error(load("northwind", "badschemaname"), "Functions for schema 'badschemaname' have not been generated yet. See fakerbase::generate")
+  generated <- fb_generate(con, ".", "public")
+  expect_error(fb_load("baddbname", ".", "public"), "Functions for database 'baddbname' have not been generated yet. See fakerbase::generate")
+  expect_error(fb_load("northwind", ".", "badschemaname"), "Functions for schema 'badschemaname' have not been generated yet. See fakerbase::generate")
 })

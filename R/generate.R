@@ -6,15 +6,18 @@ date_types <- c("date", "timestamp without time zone", "timestamp with time zone
 validate <- function(x, r_type, nullable) {
   name <- deparse(substitute(x))
   if (r_type %in% date_types) {
-    if (!inherits(x, r_type)) stop(sprintf("Expected '%s' to be of type '%s' (but was '%s')", name, r_type, typeof(x)),
-                                   call. = FALSE)
+    if (!inherits(x, r_type)) {
+      stop(sprintf("Expected '%s' to be of type '%s' (but was '%s')", name, r_type, typeof(x)), call. = FALSE)
+    }
   }
   else {
-    if (typeof(x) != r_type) stop(sprintf("Expected '%s' to be of type '%s' (but was '%s')", name, r_type, typeof(x)),
-                                  call. = FALSE)
+    if (typeof(x) != r_type) {
+      stop(sprintf("Expected '%s' to be of type '%s' (but was '%s')", name, r_type, typeof(x)), call. = FALSE)
+    }
   }
-  if (!nullable && any(is.na(x))) stop(sprintf("NA values found in '%s', but it is not nullable", name),
-                                       call. = FALSE)
+  if (!nullable && any(is.na(x))) {
+    stop(sprintf("NA values found in '%s', but it is not nullable", name), call. = FALSE)
+  }
 }
 
 build <- function(table, env = asNamespace("fakerbase")) {
@@ -77,9 +80,9 @@ fetch_tables <- function(con, schema_name) {
 #' @param schema_name name of the db schema
 #' @returns list of named functions corresponding to the tables in the schema
 #' @export
-generate <- function(con, schema_name = "public") {
+fb_generate <- function(con, path = ".", schema_name = "public") {
   dbname <- DBI::dbGetInfo(con)$dbname
-  dest <- file.path("inst/fakerbase", dbname, schema_name)
+  dest <- file.path(path, "inst/fakerbase", dbname, schema_name)
   dir.create(dest, recursive = TRUE, showWarnings = FALSE)
   tables <- tables_with_types(tables = fetch_tables(con, schema_name))
   fns <- lapply(tables, build)
@@ -93,13 +96,17 @@ generate <- function(con, schema_name = "public") {
 #' @param schema_name name of the db schema
 #' @returns list of named functions corresponding to the tables in the schema
 #' @export
-load <- function(dbname, schema_name = "public") {
-  db_dir <- file.path("inst/fakerbase", dbname)
+fb_load <- function(dbname, path = ".", schema_name = "public") {
+  db_dir <- file.path(path, "inst/fakerbase", dbname)
   e <- "Functions for database '%s' have not been generated yet. See fakerbase::generate"
-  if (!dir.exists(db_dir)) stop(sprintf(e, dbname), call. = FALSE)
+  if (!dir.exists(db_dir)) {
+    stop(sprintf(e, dbname), call. = FALSE)
+  }
   schema_dir <- file.path(db_dir, schema_name)
   e <- "Functions for schema '%s' have not been generated yet. See fakerbase::generate"
-  if (!dir.exists(schema_dir)) stop(sprintf(e, schema_name), call. = FALSE)
+  if (!dir.exists(schema_dir)) {
+    stop(sprintf(e, schema_name), call. = FALSE)
+  }
   generated <- file.path(schema_dir, "generated.rds")
   readRDS(generated)
 }
