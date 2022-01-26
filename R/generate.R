@@ -77,12 +77,19 @@ fetch_tables <- function(con, schema_name) {
 #' Generate mocking functions for all tables in the given db schema
 #'
 #' @param con DBI connection
+#' @param package_path (optional) path to package root in which to generate functions
+#' @param path (options) path to directory in which to generate functions.
+#' Will only apply if not using package_path argument
 #' @param schema_name name of the db schema
 #' @returns list of named functions corresponding to the tables in the schema
 #' @export
-fb_generate <- function(con, path = ".", schema_name = "public") {
+fb_generate <- function(con, package_path = NULL, path = ".", schema_name = "public") {
   dbname <- DBI::dbGetInfo(con)$dbname
-  dest <- file.path(path, "inst/fakerbase", dbname, schema_name)
+  if (!is.null(package_path)) {
+    dest <- file.path(package_path, "inst/fakerbase", dbname, schema_name)
+  } else {
+    dest <- file.path(path, "fakerbase", dbname, schema_name)
+  }
   dir.create(dest, recursive = TRUE, showWarnings = FALSE)
   tables <- tables_with_types(tables = fetch_tables(con, schema_name))
   fns <- lapply(tables, build)
@@ -93,17 +100,24 @@ fb_generate <- function(con, path = ".", schema_name = "public") {
 #' Load previously generated mocking functions for all tables in the given db and schema
 #'
 #' @param dbname name of the database
+#' @param package (optional) name of the package for which functions have been generated
+#' @param path (optional) absolute path where functions where generated.
+#' Only used if package argument is not provided.
 #' @param schema_name name of the db schema
 #' @returns list of named functions corresponding to the tables in the schema
 #' @export
-fb_load <- function(dbname, path = ".", schema_name = "public") {
-  db_dir <- file.path(path, "inst/fakerbase", dbname)
-  e <- "Functions for database '%s' have not been generated yet. See fakerbase::generate"
+fb_load <- function(dbname, package = NULL, path = ".", schema_name = "public") {
+  if (!is.null(package)) {
+    db_dir <- system.file("fakerbase", dbname, package = package)
+  } else {
+    db_dir <- file.path(path, "fakerbase", dbname)
+  }
+  e <- "Functions for database '%s' have not been generated yet. See fakerbase::fb_generate"
   if (!dir.exists(db_dir)) {
     stop(sprintf(e, dbname), call. = FALSE)
   }
   schema_dir <- file.path(db_dir, schema_name)
-  e <- "Functions for schema '%s' have not been generated yet. See fakerbase::generate"
+  e <- "Functions for schema '%s' have not been generated yet. See fakerbase::fb_generate"
   if (!dir.exists(schema_dir)) {
     stop(sprintf(e, schema_name), call. = FALSE)
   }

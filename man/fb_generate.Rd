@@ -4,10 +4,15 @@
 \alias{fb_generate}
 \title{Generate mocking functions for all tables in the given db schema}
 \usage{
-fb_generate(con, path = ".", schema_name = "public")
+fb_generate(con, package_path = NULL, path = ".", schema_name = "public")
 }
 \arguments{
 \item{con}{DBI connection}
+
+\item{package_path}{(optional) path to package root in which to generate functions}
+
+\item{path}{(options) path to directory in which to generate functions.
+Will only apply if not using package_path argument}
 
 \item{schema_name}{name of the db schema}
 }

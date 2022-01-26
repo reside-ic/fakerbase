@@ -4,10 +4,15 @@
 \alias{fb_load}
 \title{Load previously generated mocking functions for all tables in the given db and schema}
 \usage{
-fb_load(dbname, path = ".", schema_name = "public")
+fb_load(dbname, package = NULL, path = ".", schema_name = "public")
 }
 \arguments{
 \item{dbname}{name of the database}
+
+\item{package}{(optional) name of the package for which functions have been generated}
+
+\item{path}{(optional) absolute path where functions where generated.
+Only used if package argument is not provided.}
 
 \item{schema_name}{name of the db schema}
 }

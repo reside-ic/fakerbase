@@ -58,7 +58,7 @@ jobs:
           $client.DownloadFile("https://raw.githubusercontent.com/yugabyte/yugabyte-db/master/sample/northwind_ddl.sql", "northwind_ddl.sql")
           $env:PGPASSWORD = 'northwind'
           & $env:PGBIN\psql -U northwind -h localhost -d northwind -f northwind_ddl.sql
-
+          Remove-Item 'northwind_ddl.sql'
       - name: Start test DB Mac
         if: runner.os == 'macOS'
         run: |
@@ -80,6 +80,7 @@ jobs:
           psql --command="CREATE USER northwind WITH PASSWORD 'northwind';" --command="CREATE DATABASE northwind OWNER northwind;" postgres
           wget https://raw.githubusercontent.com/yugabyte/yugabyte-db/master/sample/northwind_ddl.sql
           PGPASSWORD=northwind psql northwind -h localhost -d northwind -f northwind_ddl.sql
+          rm northwind_ddl.sql
       - uses: r-lib/actions/check-r-package@v1
 
       - name: Show testthat output
