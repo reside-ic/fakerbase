@@ -86,12 +86,17 @@ fetch_tables <- function(con, schema_name) {
 fb_generate <- function(con, package_path = NULL, path = ".", schema_name = "public") {
   dbname <- DBI::dbGetInfo(con)$dbname
   if (!is.null(package_path)) {
-    dest <- file.path(package_path, "inst/fakerbase", dbname, schema_name)
+    desc <- file.path(package_path, "DESCRIPTION")
+    if (!file.exists(desc)) {
+      stop("Did not find package at ", package_path)
+    }
+    dest <- file.path(package_path, "inst", "fakerbase", dbname, schema_name)
   } else {
     dest <- file.path(path, "fakerbase", dbname, schema_name)
   }
   dir.create(dest, recursive = TRUE, showWarnings = FALSE)
-  tables <- tables_with_types(tables = fetch_tables(con, schema_name))
+  tables <-
+    tables_with_types(tables = fetch_tables(con, schema_name))
   fns <- lapply(tables, build)
   saveRDS(fns, file.path(dest, "generated.rds"))
   fns
@@ -109,17 +114,19 @@ fb_generate <- function(con, package_path = NULL, path = ".", schema_name = "pub
 fb_load <- function(dbname, package = NULL, path = ".", schema_name = "public") {
   if (!is.null(package)) {
     db_dir <- system.file("fakerbase", dbname, package = package)
+    detail <- sprintf("for package %s", package)
   } else {
     db_dir <- file.path(path, "fakerbase", dbname)
+    detail <- sprintf("at path %s", path)
   }
-  e <- "Functions for database '%s' have not been generated yet. See fakerbase::fb_generate"
   if (!dir.exists(db_dir)) {
-    stop(sprintf(e, dbname), call. = FALSE)
+    e <- "Functions for database '%s' have not been generated %s. See fakerbase::fb_generate"
+    stop(sprintf(e, dbname, detail), call. = FALSE)
   }
   schema_dir <- file.path(db_dir, schema_name)
-  e <- "Functions for schema '%s' have not been generated yet. See fakerbase::fb_generate"
   if (!dir.exists(schema_dir)) {
-    stop(sprintf(e, schema_name), call. = FALSE)
+    e <- "Functions for schema '%s' have not been generated %s. See fakerbase::fb_generate"
+    stop(sprintf(e, schema_name, detail), call. = FALSE)
   }
   generated <- file.path(schema_dir, "generated.rds")
   readRDS(generated)
