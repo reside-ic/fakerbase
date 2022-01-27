@@ -1,4 +1,4 @@
-# Fakerbase
+# Fakerbase <img src='man/figures/logo.png' align="right" height="138.5" />
 [![codecov](https://codecov.io/gh/reside-ic/fakerbase/branch/master/graph/badge.svg?token=PSbEOyI1yi)](https://codecov.io/gh/reside-ic/fakerbase)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 ![R-CMD-check](https://github.com/reside-ic/fakerbase/actions/workflows/R-CMD-check.yml/badge.svg)
