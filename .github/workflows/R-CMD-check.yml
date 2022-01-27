@@ -1,0 +1,96 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples/check-standard.yaml
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+name: R-CMD-check
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: macOS-latest,   r: 'release' }
+          - { os: windows-latest, r: 'release' }
+          - { os: ubuntu-latest,   r: 'devel', http-user-agent: 'release' }
+          - { os: ubuntu-latest,   r: 'release' }
+          - { os: ubuntu-latest,   r: 'oldrel-1' }
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v1
+        with:
+          extra-packages: rcmdcheck
+
+      - name: Start test DB Linux
+        if: runner.os == 'Linux'
+        run: ./scripts/start_test_db.sh
+
+      - name: Start test DB Windows
+        if: runner.os == 'Windows'
+        run: |
+          $pgService = Get-Service -Name postgresql*
+          Set-Service -InputObject $pgService -Status running -StartupType automatic
+          Start-Process -FilePath "$env:PGBIN\pg_isready" -Wait -PassThru
+          & $env:PGBIN\psql --command="CREATE USER northwind WITH PASSWORD 'northwind';" --command="CREATE DATABASE northwind OWNER northwind;" postgres
+          $client = new-object System.Net.WebClient
+          $client.DownloadFile("https://raw.githubusercontent.com/yugabyte/yugabyte-db/master/sample/northwind_ddl.sql", "northwind_ddl.sql")
+          $env:PGPASSWORD = 'northwind'
+          & $env:PGBIN\psql -U northwind -h localhost -d northwind -f northwind_ddl.sql
+          Remove-Item 'northwind_ddl.sql'
+      - name: Start test DB Mac
+        if: runner.os == 'macOS'
+        run: |
+          brew services start postgresql
+          echo "Check PostgreSQL service is running"
+          i=10
+          COMMAND='pg_isready'
+          while [ $i -gt 0 ]; do
+              echo "Check PostgreSQL service status"
+              eval $COMMAND && break
+              ((i--))
+              if [ $i == 0 ]; then
+                  echo "PostgreSQL service not ready, all attempts exhausted"
+                  exit 1
+              fi
+              echo "PostgreSQL service not ready, wait 10 more sec, attempts left: $i"
+              sleep 10
+          done
+          psql --command="CREATE USER northwind WITH PASSWORD 'northwind';" --command="CREATE DATABASE northwind OWNER northwind;" postgres
+          wget https://raw.githubusercontent.com/yugabyte/yugabyte-db/master/sample/northwind_ddl.sql
+          PGPASSWORD=northwind psql northwind -h localhost -d northwind -f northwind_ddl.sql
+          rm northwind_ddl.sql
+      - uses: r-lib/actions/check-r-package@v1
+
+      - name: Show testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          path: check

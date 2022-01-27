@@ -1,2 +1,5 @@
 .idea
 generated.R
+.Rproj.user
+inst/fakerbase
+*/inst/fakerbase
