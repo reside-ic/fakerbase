@@ -24,7 +24,7 @@ Then you can use the following connection:
 2. Generate and load functions for creating fake db tables
 
 ```{r}    
-    db <- fakerbase::generate(con, "public")
+    db <- fakerbase::fb_generate(con, schema_name = "public")
 ```
 
 3. Use generated functions to create fake db tables
@@ -40,7 +40,7 @@ Then you can use the following connection:
 4. To re-use generated functions without re-connecting to the database, use
 
 ```{r}
-    db <- fakerbase::load("northwind", "public")
+    db <- fakerbase::fb_load("northwind", schema_name = "public")
 ```
 
 ## Testing
