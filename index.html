@@ -82,7 +82,7 @@
 <ol start="2" style="list-style-type: decimal">
 <li>Generate and load functions for creating fake db tables</li>
 </ol>
-<pre class="{r}"><code><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">fakerbase</span><span class="fu">::</span><span class="fu">generate</span><span class="op">(</span><span class="va">con</span>, <span class="st">"public"</span><span class="op">)</span></code></pre>
+<pre class="{r}"><code><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">fakerbase</span><span class="fu">::</span><span class="fu"><a href="reference/fb_generate.html">fb_generate</a></span><span class="op">(</span><span class="va">con</span>, schema_name <span class="op">=</span> <span class="st">"public"</span><span class="op">)</span></code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>Use generated functions to create fake db tables</li>
 </ol>
@@ -94,7 +94,7 @@
 <ol start="4" style="list-style-type: decimal">
 <li>To re-use generated functions without re-connecting to the database, use</li>
 </ol>
-<pre class="{r}"><code><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">fakerbase</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"northwind"</span>, <span class="st">"public"</span><span class="op">)</span></code></pre>
+<pre class="{r}"><code><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">fakerbase</span><span class="fu">::</span><span class="fu"><a href="reference/fb_load.html">fb_load</a></span><span class="op">(</span><span class="st">"northwind"</span>, schema_name <span class="op">=</span> <span class="st">"public"</span><span class="op">)</span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a>
