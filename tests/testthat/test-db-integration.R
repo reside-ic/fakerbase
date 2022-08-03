@@ -1,4 +1,5 @@
 test_that("can generate from db", {
+  testthat::skip_on_cran()
   con <- DBI::dbConnect(RPostgres::Postgres(),
                         dbname = "northwind",
                         host = "localhost",
@@ -19,6 +20,7 @@ test_that("can generate from db", {
 })
 
 test_that("can generate and load from package", {
+  testthat::skip_on_cran()
   con <- DBI::dbConnect(RPostgres::Postgres(),
                         dbname = "northwind",
                         host = "localhost",
@@ -39,6 +41,7 @@ test_that("can generate and load from package", {
 })
 
 test_that("throws error if provided package_path does not point to a package", {
+  testthat::skip_on_cran()
   con <- DBI::dbConnect(RPostgres::Postgres(),
                         dbname = "northwind",
                         host = "localhost",
@@ -51,6 +54,7 @@ test_that("throws error if provided package_path does not point to a package", {
 })
 
 test_that("can generate and load from absolute path", {
+  testthat::skip_on_cran()
   con <- DBI::dbConnect(RPostgres::Postgres(),
                         dbname = "northwind",
                         host = "localhost",
@@ -64,6 +68,7 @@ test_that("can generate and load from absolute path", {
 })
 
 test_that("loading un-generated functions gives descriptive error message", {
+  testthat::skip_on_cran()
   con <- DBI::dbConnect(RPostgres::Postgres(),
                         dbname = "northwind",
                         host = "localhost",
